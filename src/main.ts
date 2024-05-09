@@ -68,7 +68,6 @@ function createCommand(
       break;
     }
     case 'u':
-    case 'up':
     case 'upd':
     case 'update': {
       command = [
@@ -156,6 +155,29 @@ export default function main() {
     exit(1);
   }
   
+  if ( values.args.length == 0
+    || values.flags.help
+  ) return text `
+pkg - friendly Arch package wrapper
+
+USAGE:
+  pkg [COMMAND] [OPTIONS] [ARG ...]
+
+COMMAND:
+  i, ins, install \t install packages
+  r, rem, remove  \t remove packages recursively
+  u, upd, update  \t update/upgrade packages
+  s, ser, search  \t search packages
+  f, fin, find    \t find packages and verbose info
+
+OPTIONS:
+  -h, --help \t show this help text
+  -y, --yes  \t alias for '--noconfirm'
+  -a, --aur  \t use AUR instead of Arch repo
+  -s, --sync \t alias for '-y'
+`.printLn()
+  
   runCommand(values);
-  return;
+  
+  return undefined;
 }
