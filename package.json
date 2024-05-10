@@ -2,6 +2,9 @@
   "name": "pkg",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "build": "bun build ./index.ts --compile --outfile build/pkg"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

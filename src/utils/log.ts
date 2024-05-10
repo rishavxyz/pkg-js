@@ -27,7 +27,10 @@ export default function log(
       { depth: 10 }
     )
 
-    case "V": case null:
+    case "V":
     return console.log("VERBOSE:", ...data)
+
+    case null:
+    return console.log(...data);
   }
 }

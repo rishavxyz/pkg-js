@@ -4,6 +4,7 @@ import { exit } from 'process'
 import log from "$/log";
 import createFlags from "$/createFlags";
 import text from "$/text";
+import error, { ErrorType, type Error } from "$/error";
 
 interface Flags {
   help?: boolean, aur?: boolean,
@@ -99,8 +100,9 @@ function createCommand(
       break;
     }
     default: {
-      throw new TypeError(
-        `Unknown option '${option}'. Use '--help' to see all available options.`
+      throw new error(ErrorType.FlagError,
+        `Unknown option '${option}'`,
+        `Use '--help' to see all available options`
       )
     }
   }
@@ -127,8 +129,18 @@ async function runCommand(values: { args: string[], flags:Flags }) {
       }
     )
 
-    if (await proc.exited) {
-      throw new Error(`Command failed with exit code 1.`)
+    if (await proc.exited == 1) {
+      if ( command.includes('-Ss')
+        || command.includes('-As')
+      ) {
+        throw new error('ItemNotFound'
+        , 'Could not found the item'
+        , command.includes('-As')
+        ? 'Maybe a typo or item does not exist'
+        : 'Try search the AUR with \'-a\' flag'
+        )  
+      }
+      throw new error('CommandError', 'Command failed')
     }
     const timeTook = Date.now() - commandStrated;
     const timeRaw = timeTook / 1000;
@@ -137,11 +149,11 @@ async function runCommand(values: { args: string[], flags:Flags }) {
     const unit = timeRaw > 59 ? 'minutes' : 'seconds';
 
     text `\nCompleted in ${time.toFixed(2)} ${unit}`
-    .color('gray')
+    .color('grey')
     .printLn()
   }
   catch (ERR) {
-    log("E", `\n${String(ERR)}`);
+    error.show(ERR as Error)
     exit(1);
   }
 }
