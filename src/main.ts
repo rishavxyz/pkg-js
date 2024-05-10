@@ -5,6 +5,8 @@ import log from "$/log";
 import createFlags from "$/createFlags";
 import text from "$/text";
 import error, { ErrorType, type Error } from "$/error";
+import getCommandByOption from "$/getCommandByOption";
+import parseOptions from "$/parseOptions";
 
 interface Flags {
   help?: boolean, aur?: boolean,
@@ -46,81 +48,47 @@ function getArgs(): {
   }
 }
 
-function createCommand(
-  { args, flags }: { args: string[], flags: Flags }
-) {
+function createCommand({ args, flags }: { args: string[], flags:Flags }) {
   const option = args[0];
   args.shift();
 
-  let command: string[] = [];
-
   const sync = flags.sync ? '-yy' : '';
   const yes = flags.yes ? '--noconfirm' : '';
+  const aur = flags.aur ?? false;
+  const rest = args.join(' ');
 
-  switch (option) {
-    case 'i':
-    case 'ins':
-    case 'install': {
-      command = [
-        'sudo', 'aura',
-        flags.aur ? '-Acax' : '-S',
-        '--needed', yes, sync
-      ];
-      break;
-    }
-    case 'u':
-    case 'upd':
-    case 'update': {
-      command = [
-        'sudo', 'aura',
-        flags.aur ? '-Au' : '-Su',
-        '--needed', yes, sync
-      ];
-      break;
-    }
-    case 'r':
-    case 'rem':
-    case 'remove': {
-      command = [
-        'sudo', 'aura',
-        '-Runsc', yes
-      ];
-      break;
-    }
-    case 's':
-    case 'ser':
-    case 'search': {
-      command = ['aura', flags.aur ? '-As' : '-Ss'];
-      break;
-    }
-    case 'f':
-    case 'fin':
-    case 'find': {
-      command = ['aura', flags.aur ? '-Ai' : '-Si'];
-      break;
-    }
-    default: {
-      throw new error(ErrorType.FlagError,
-        `Unknown option '${option}'`,
-        `Use '--help' to see all available options`
-      )
-    }
-  }
+  parseOptions
+    `i/install -> sudo aura --needed ${aur ? '-Acax' : '-S'} ${sync} ${yes} ${rest}`
+    `u/update          -> sudo aura --needed ${aur ? '-Au' : '-Su'} ${sync} ${rest}`
+    `r/remove          -> sudo aura -Runsc ${yes} ${rest}`
+    `b/backup          -> sudo aura -B`
+    `br/backup-restore -> sudo aura -Br`
+    `bc/backup-clean   -> sudo aura -Bc`
+    `f/find            -> aura ${aur ? '-Ai' : '-Si'} ${args[0]}`
+    `s/search          -> aura ${aur ? '-As' : '-Ss'} ${args[0]}`
+    `li/list-installed -> aura -Q`
 
-  return command.filter(onlyStrings => onlyStrings)
-  .concat(args);
+  const command = getCommandByOption(option)
+
+  return command;
 }
 
 async function runCommand(values: { args: string[], flags:Flags }) {
   try {
     const command = createCommand(values);
-    const commandStrated = Date.now();
+
+    if (command instanceof error)
+    throw new error(
+      command.type as keyof typeof ErrorType,
+      command.error, command.message
+    )
 
     text `\n ${command.join(' ')} \n`
     .color('black')
     .color('bgCyan')
     .printLn()
 
+    const commandStrated = Date.now();
     const proc = Bun.spawn(
       command
       ,
@@ -176,11 +144,15 @@ USAGE:
   pkg [COMMAND] [OPTIONS] [ARG ...]
 
 COMMAND:
-  i, ins, install \t install packages
-  r, rem, remove  \t remove packages recursively
-  u, upd, update  \t update/upgrade packages
-  s, ser, search  \t search packages
-  f, fin, find    \t find packages and verbose info
+  i, install [-y|-s|-a]  [pkg1 pkg2 ...] \t install packages
+  r, remove  [-y]        [pkg1 pkg2 ...] \t remove packages recursively
+  u, update  [-a|-s]     [pkg1 pkg2 ...] \t update/upgrade packages
+  s, search  [-a]        [pkg1]          \t search packages
+  f, find    [-a]        [pkg1]          \t find packages and verbose info
+  b, backup                              \t backup current package state
+  br, backup-restore                     \t restore from backed interactively
+  bc, backup-clean       [COUNT]         \t remove backed-up package state
+  li, list-installed                     \t list installed packages
 
 OPTIONS:
   -h, --help \t show this help text

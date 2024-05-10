@@ -1,10 +1,11 @@
 import log from "./log";
 
 export enum ErrorType {
-  ProcessError = "ProcessError",
-  ItemNotFound = "ItemNotFound",
-  CommandError = "CommandError",
-  FlagError    = "FlagError"
+  ProcessError,
+  ItemNotFound,
+  CommandError,
+  FlagError   ,
+  TypeError
 }
 
 export interface Error {
@@ -16,7 +17,7 @@ export interface Error {
 export default class error extends ErrorEvent {
 
   constructor(
-    type: ErrorType | keyof typeof ErrorType,
+    type: keyof typeof ErrorType,
     cause: string, message?: string
   ) {
     super(type, { error: cause, message });
