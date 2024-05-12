@@ -59,16 +59,16 @@ function createCommand({ args, flags }: { args: string[], flags:Flags }) {
 
   parseOptions
     `i/install -> sudo aura --needed ${aur ? '-Acax' : '-S'} ${sync} ${yes} ${rest}`
-    `u/update          -> sudo aura --needed ${aur ? '-Au' : '-Su'} ${sync} ${rest}`
-    `r/remove          -> sudo aura -Runsc ${yes} ${rest}`
+    `up/update         -> sudo aura --needed ${aur ? '-Au' : '-Su'} ${sync} ${rest}`
+    `rm/remove         -> sudo aura -Runsc ${yes} ${rest}`
     `b/backup          -> sudo aura -B`
     `br/backup-restore -> sudo aura -Br`
     `bc/backup-clean   -> sudo aura -Bc`
-    `f/find            -> aura ${aur ? '-Ai' : '-Si'} ${args[0]}`
+    `fd/find           -> aura ${aur ? '-Ai' : '-Si'} ${args[0]}`
     `s/search          -> aura ${aur ? '-As' : '-Ss'} ${args[0]}`
     `li/list-installed -> aura -Q`
 
-  const command = getCommandByOption(option)
+  const command = getCommandByOption(option);
 
   return command;
 }
