@@ -144,15 +144,15 @@ USAGE:
   pkg [COMMAND] [OPTIONS] [ARG ...]
 
 COMMAND:
-  i, install [-y|-s|-a]  [pkg1 pkg2 ...] \t install packages
-  r, remove  [-y]        [pkg1 pkg2 ...] \t remove packages recursively
-  u, update  [-a|-s]     [pkg1 pkg2 ...] \t update/upgrade packages
-  s, search  [-a]        [pkg1]          \t search packages
-  f, find    [-a]        [pkg1]          \t find packages and verbose info
-  b, backup                              \t backup current package state
-  br, backup-restore                     \t restore from backed interactively
-  bc, backup-clean       [COUNT]         \t remove backed-up package state
-  li, list-installed                     \t list installed packages
+  i,  install [-y|-s|-a]  [pkg1 pkg2 ...] \t install packages
+  rm, remove  [-y]        [pkg1 pkg2 ...] \t remove packages recursively
+  up, update  [-a|-s]     [pkg1 pkg2 ...] \t update/upgrade packages
+  fd, find    [-a]        [pkg1]          \t find packages and verbose info
+  s,  search  [-a]        [pkg1]          \t search packages
+  b,  backup                              \t backup current package state
+  br, backup-restore                      \t restore from backed interactively
+  bc, backup-clean        [COUNT]         \t remove backed-up package state
+  li, list-installed                      \t list installed packages
 
 OPTIONS:
   -h, --help \t show this help text
@@ -160,8 +160,8 @@ OPTIONS:
   -a, --aur  \t use AUR instead of Arch repo
   -s, --sync \t alias for '-y'
 `.printLn()
-  
+
   runCommand(values);
-  
+
   return undefined;
 }

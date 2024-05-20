@@ -3,7 +3,8 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "bun build ./index.ts --compile --outfile build/pkg"
+    "build": "bun build ./index.ts --compile --outfile build/pkg",
+    "copy-bin": "cp -v ./build/pkg ~/dotfiles/bin/pkg"
   },
   "devDependencies": {
     "@types/bun": "latest"
